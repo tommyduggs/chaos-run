@@ -10,13 +10,22 @@ public class PlayerController : MonoBehaviour
     private bool isRunning = false;
     private bool isJumping = false;
     private bool isSliding = false;
-    private float jumpForce = 13.0f;
+    private bool isTorpedoJumping = false;
+    private bool usedDoubleJump = false;
+    public float jumpForce = 13f;
+    public float floatJumpForce = 9f;
+    public float floatJumpGravity = 1f;
+    public float torpedoJumpForce = 28f;
+    public float torpedoJumpGravity = 7f;
+    private float initialGravityScale;
 
     // Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
         playerRb = GetComponent<Rigidbody2D>();
+
+        initialGravityScale = playerRb.gravityScale;
 
         Run();
     }
@@ -30,6 +39,16 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Q))
         {
             Jump();
+        }
+
+        if(Input.GetKeyDown(KeyCode.W))
+        {
+            FloatJump();
+        }
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            TorpedoJump();
         }
 
         if(Input.GetKeyDown(KeyCode.R))
@@ -53,7 +72,10 @@ public class PlayerController : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Ground"))
         {
+            playerRb.gravityScale = initialGravityScale;
             isJumping = false;
+            isTorpedoJumping = false;
+            usedDoubleJump = false;
         }
         else if (col.gameObject.CompareTag("Enemy"))
         {
@@ -75,6 +97,41 @@ public class PlayerController : MonoBehaviour
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             isJumping = true;
         }
+        // Double Jump
+        else if (isJumping && !isTorpedoJumping && !usedDoubleJump)
+        {
+            playerRb.velocity = Vector2.zero;
+            playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            usedDoubleJump = true;
+        }
+    }
+
+    private void FloatJump()
+    {
+        if (!isJumping && !isSliding)
+        {
+            playerRb.gravityScale = floatJumpGravity;
+            playerRb.AddForce(Vector2.up * floatJumpForce, ForceMode2D.Impulse);
+            isJumping = true;
+        }
+    }
+
+    private void TorpedoJump()
+    {
+        if (!isJumping && !isSliding)
+        {
+            playerRb.gravityScale = torpedoJumpGravity;
+            playerRb.AddForce(Vector2.up * torpedoJumpForce, ForceMode2D.Impulse);
+            isJumping = true;
+            isTorpedoJumping = true;
+        }
+
+        else if (isJumping && isTorpedoJumping)
+        {
+            playerRb.gravityScale = 0.0f;
+            playerRb.velocity = Vector2.zero;
+            StartCoroutine(TorpedoTimeout());
+        }
     }
 
     private void Slide()
@@ -89,8 +146,14 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator SlideTimeout()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.0f);
         isSliding = false;
         animator.SetBool("isSliding", isSliding);
+    }
+
+    IEnumerator TorpedoTimeout()
+    {
+        yield return new WaitForSeconds(1.0f);
+        playerRb.gravityScale = torpedoJumpGravity;
     }
 }
