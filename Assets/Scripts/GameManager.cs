@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public Grid grid;
+    public GameObject level;
     public bool gameActive;
-    private float moveSpeed = 13f;
+    private float moveSpeed = 15f;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +29,6 @@ public class GameManager : MonoBehaviour
 
     private void MoveGridLeft()
     {
-        grid.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+        level.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
     }
 }

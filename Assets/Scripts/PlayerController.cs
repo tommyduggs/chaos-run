@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     private bool isRunning = false;
     private bool isJumping = false;
     private bool isSliding = false;
-    private float jumpForce = 12.0f;
+    private float jumpForce = 13.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
         float verticalVelocity = playerRb.velocity.y;
         animator.SetFloat("verticalVelocity", verticalVelocity);
 
-        if(Input.GetKeyDown(KeyCode.Q) && !isJumping && !isSliding)
+        if(Input.GetKeyDown(KeyCode.Q))
         {
             Jump();
         }
@@ -38,7 +38,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D col)
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("JumpTrigger"))
+        {
+            Jump();
+        }
+        else if(other.CompareTag("SlideTrigger"))
+        {
+            Slide();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.CompareTag("Ground"))
         {
@@ -59,15 +70,21 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        isJumping = true;
+        if (!isJumping && !isSliding)
+        {
+            playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            isJumping = true;
+        }
     }
 
     private void Slide()
     {
-        isSliding = true;
-        animator.SetBool("isSliding", isSliding);
-        StartCoroutine(SlideTimeout());
+        if (!isJumping && !isSliding)
+        {
+            isSliding = true;
+            animator.SetBool("isSliding", isSliding);
+            StartCoroutine(SlideTimeout());
+        }
     }
 
     IEnumerator SlideTimeout()
