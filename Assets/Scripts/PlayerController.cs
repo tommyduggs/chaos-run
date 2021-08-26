@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private GameObject level;
     private Animator animator;
     private Rigidbody2D playerRb;
     private bool isRunning = false;
@@ -18,6 +19,9 @@ public class PlayerController : MonoBehaviour
     public float torpedoJumpForce = 28f;
     public float torpedoJumpGravity = 7f;
     private float initialGravityScale;
+    private float lastCheckpointPosition;
+    private int lives = 3;
+    private Vector3 initialPlayerPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -26,6 +30,7 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody2D>();
 
         initialGravityScale = playerRb.gravityScale;
+        initialPlayerPosition = transform.position;
 
         Run();
     }
@@ -58,6 +63,11 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("Checkpoint"))
+        {
+            Debug.Log("Hit Checkpoint");
+            lastCheckpointPosition = level.transform.position.x;
+        }
         if(other.CompareTag("JumpTrigger"))
         {
             Jump();
@@ -80,7 +90,16 @@ public class PlayerController : MonoBehaviour
         else if (col.gameObject.CompareTag("Enemy"))
         {
             animator.SetTrigger("playerDied");
-            gameManager.EndGame();
+            lives--;
+            if (lives == 0)
+            {
+                gameManager.EndGame();
+            }
+            else
+            {
+                level.transform.position = new Vector3(lastCheckpointPosition, level.transform.position.y, level.transform.position.z);
+                transform.position = initialPlayerPosition;
+            }
         }
     }
 

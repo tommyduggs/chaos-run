@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - JumpTrigger
   - SlideTrigger
+  - Checkpoint
   layers:
   - Default
   - TransparentFX

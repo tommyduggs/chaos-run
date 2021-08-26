@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI messageText;
+    [SerializeField] private GameObject onScreenText;
     public GameObject level;
     public bool gameActive;
     private float moveSpeed = 15f;
@@ -11,6 +14,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         gameActive = true;
+
+        DisplayMessage("Testing UI Message");
     }
 
     // Update is called once per frame
@@ -30,5 +35,26 @@ public class GameManager : MonoBehaviour
     private void MoveGridLeft()
     {
         level.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+    }
+
+    public void DisplayMessage(string text)
+    {
+        TextWriter.AddWriter_Static(messageText, text, 0.05f, true, true, EndMessages);
+        StartMessage();
+    }
+    private void StartMessage()
+    {
+        //StartTalkingSound();
+        onScreenText.SetActive(true);
+    }
+    private void EndMessages()
+    {
+        //StopTalkingSound();
+        StartCoroutine(HideMessages());
+    }
+    private IEnumerator HideMessages()
+    {
+        yield return new WaitForSeconds(2f);
+        onScreenText.SetActive(false);
     }
 }
