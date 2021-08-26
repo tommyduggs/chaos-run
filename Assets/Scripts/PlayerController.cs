@@ -89,17 +89,23 @@ public class PlayerController : MonoBehaviour
         }
         else if (col.gameObject.CompareTag("Enemy"))
         {
-            animator.SetTrigger("playerDied");
-            lives--;
-            if (lives == 0)
-            {
-                gameManager.EndGame();
-            }
-            else
-            {
-                level.transform.position = new Vector3(lastCheckpointPosition, level.transform.position.y, level.transform.position.z);
-                transform.position = initialPlayerPosition;
-            }
+            PlayerHurt();
+        }
+    }
+
+    private void PlayerHurt()
+    {
+        animator.SetTrigger("playerDied");
+        lives--;
+
+        if (lives == 0)
+        {
+            gameManager.EndGame();
+        }
+        else
+        {
+            level.transform.position = new Vector3(lastCheckpointPosition, level.transform.position.y, level.transform.position.z);
+            transform.position = initialPlayerPosition;
         }
     }
 
