@@ -8,23 +8,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private GameObject onScreenText;
     public GameObject level;
-    public bool gameActive;
-    private float moveSpeed = 15f;
+    public bool gameActive = false;
     // Start is called before the first frame update
     void Start()
     {
-        gameActive = true;
 
-        //DisplayMessage("Testing UI Message");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(gameActive)
-        {
-            MoveGridLeft();
-        }
+
     }
 
     public void RestartGame()
@@ -35,11 +29,6 @@ public class GameManager : MonoBehaviour
     public void EndGame()
     {
         gameActive = false;
-    }
-
-    private void MoveGridLeft()
-    {
-        //level.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
     }
 
     public void DisplayMessage(string text)
@@ -62,9 +51,13 @@ public class GameManager : MonoBehaviour
         //StopTalkingSound();
         StartCoroutine(HideMessages());
     }
-    private IEnumerator HideMessages()
+    public IEnumerator HideMessages()
     {
         yield return new WaitForSeconds(2f);
+        onScreenText.SetActive(false);
+    }
+    public void HideMessagesImmediately()
+    {
         onScreenText.SetActive(false);
     }
 }

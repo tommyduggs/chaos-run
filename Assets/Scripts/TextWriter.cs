@@ -6,7 +6,7 @@ using System;
 
 public class TextWriter : MonoBehaviour
 {
-private static TextWriter instance;
+    private static TextWriter instance;
     private List<TextWriterSingle> textWriterSingleList;
 
     private void Awake() {
