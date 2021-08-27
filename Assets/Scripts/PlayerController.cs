@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private float lastCheckpointPosition;
     private int lives = 3;
     private Vector3 initialPlayerPosition;
+    private int gemCount = 0;
+    public float bounceForce = 18f;
 
     // Start is called before the first frame update
     void Start()
@@ -62,22 +64,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("Checkpoint"))
-        {
-            Debug.Log("Hit Checkpoint");
-            lastCheckpointPosition = level.transform.position.x;
-        }
-        if(other.CompareTag("JumpTrigger"))
-        {
-            Jump();
-        }
-        else if(other.CompareTag("SlideTrigger"))
-        {
-            Slide();
-        }
-    }
-
     private void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.CompareTag("Ground"))
@@ -87,9 +73,39 @@ public class PlayerController : MonoBehaviour
             isTorpedoJumping = false;
             usedDoubleJump = false;
         }
-        else if (col.gameObject.CompareTag("Enemy"))
+    }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("Checkpoint"))
+        {
+            lastCheckpointPosition = level.transform.position.x;
+        }
+        else if (other.CompareTag("Enemy"))
         {
             PlayerHurt();
+        }
+        else if(other.CompareTag("Gem"))
+        {
+            GetGem(other.gameObject);
+        }
+        else if(other.CompareTag("JumpTrigger"))
+        {
+            Jump();
+        }
+        else if(other.CompareTag("SlideTrigger"))
+        {
+            Slide();
+        }
+    }
+
+    private void GetGem(GameObject gem)
+    {
+        Destroy(gem);
+        gemCount++;
+        if(gemCount == 10)
+        {
+            lives++;
+            gemCount = 0;
         }
     }
 
@@ -97,15 +113,15 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("playerDied");
         lives--;
+        gameManager.EndGame();
 
         if (lives == 0)
         {
-            gameManager.EndGame();
+            // TODO: Build logic that shows Game Over text
         }
         else
         {
-            level.transform.position = new Vector3(lastCheckpointPosition, level.transform.position.y, level.transform.position.z);
-            transform.position = initialPlayerPosition;
+            StartCoroutine(SpawnFromLastCheckpoint());
         }
     }
 
@@ -169,6 +185,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void Bounce()
+    {
+        playerRb.velocity = Vector2.zero;
+        playerRb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
+    }
+    IEnumerator SpawnFromLastCheckpoint()
+    {
+        yield return new WaitForSeconds(3.0f);
+        level.transform.position = new Vector3(lastCheckpointPosition, level.transform.position.y, level.transform.position.z);
+        transform.position = initialPlayerPosition;
+        gameManager.RestartGame();
+    }
     IEnumerator SlideTimeout()
     {
         yield return new WaitForSeconds(1.0f);

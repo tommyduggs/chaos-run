@@ -9,6 +9,9 @@ TagManager:
   - JumpTrigger
   - SlideTrigger
   - Checkpoint
+  - Gem
+  - BouncePad
+  - EnemyHurtBox
   layers:
   - Default
   - TransparentFX

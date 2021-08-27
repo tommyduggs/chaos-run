@@ -27,6 +27,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RestartGame()
+    {
+        gameActive = true;
+    }
+
     public void EndGame()
     {
         gameActive = false;
