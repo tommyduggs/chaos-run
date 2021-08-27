@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     {
         gameActive = true;
 
-        DisplayMessage("Testing UI Message");
+        //DisplayMessage("Testing UI Message");
     }
 
     // Update is called once per frame
@@ -39,12 +39,17 @@ public class GameManager : MonoBehaviour
 
     private void MoveGridLeft()
     {
-        level.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+        //level.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
     }
 
     public void DisplayMessage(string text)
     {
         TextWriter.AddWriter_Static(messageText, text, 0.05f, true, true, EndMessages);
+        StartMessage();
+    }
+    public void DisplayMessageAndKeepOnScreen(string text)
+    {
+        TextWriter.AddWriter_Static(messageText, text, 0.05f, true, true, null);
         StartMessage();
     }
     private void StartMessage()

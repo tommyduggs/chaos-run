@@ -25,6 +25,7 @@ public class Stomper : MonoBehaviour
         }
         else if (other.CompareTag("EnemyHurtBox"))
         {
+            other.transform.parent.gameObject.tag = "Untagged";
             player.Bounce();
             Animator animator = other.transform.parent.gameObject.GetComponent<Animator>();
             animator.SetTrigger("EnemyDeath");
