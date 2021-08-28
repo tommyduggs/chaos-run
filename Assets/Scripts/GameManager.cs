@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject startMenuFirst;
     [SerializeField] private GameObject tutorialFirst;
     private EventSystem eventSystem;
-    public static bool menuOpen = false;
+    public bool menuOpen = false;
     public bool gameActive = false;
     // Start is called before the first frame update
     void Start()

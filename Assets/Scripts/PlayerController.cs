@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private TextMeshProUGUI gemText;
+    [SerializeField] private TextMeshProUGUI livesText;
     private Animator animator;
     private Rigidbody2D playerRb;
     private bool isRunning = false;
@@ -34,6 +37,8 @@ public class PlayerController : MonoBehaviour
 
         initialGravityScale = playerRb.gravityScale;
         initialPlayerPosition = transform.position;
+        
+        livesText.text = "LIVES: " + lives;
 
         Run();
     }
@@ -44,12 +49,12 @@ public class PlayerController : MonoBehaviour
         float verticalVelocity = playerRb.velocity.y;
         animator.SetFloat("verticalVelocity", verticalVelocity);
 
-        
+        ProcessInputs();
     }
 
     private void ProcessInputs()
     {
-        if(!GameManager.menuOpen)
+        if(!gameManager.menuOpen)
         {
             if(Input.GetKeyDown(KeyCode.Q))
             {
@@ -130,6 +135,9 @@ public class PlayerController : MonoBehaviour
             lives++;
             gemCount = 0;
         }
+
+        gemText.text = gemCount.ToString();
+        livesText.text = "LIVES: " + lives;
     }
 
     private void PlayerHurt()
