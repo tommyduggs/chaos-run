@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TutorialMenu : MonoBehaviour
 {
-    [SerializeField] private Tutorial tutorial;
+    [SerializeField] private TutorialController tutorialController;
     [SerializeField] private GameObject tutorialButtons;
     [SerializeField] private TutorialLevelManager tutorialLevelManager;
     // Start is called before the first frame update
@@ -21,7 +21,7 @@ public class TutorialMenu : MonoBehaviour
 
     public void StartTutorial()
     {
-        tutorial.gameObject.SetActive(true);
+        tutorialController.gameObject.SetActive(true);
         tutorialButtons.gameObject.SetActive(false);
     }
 

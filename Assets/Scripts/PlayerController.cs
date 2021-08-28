@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private TextMeshProUGUI gemText;
     [SerializeField] private TextMeshProUGUI livesText;
+    [SerializeField] private TutorialController tutorialController;
+    [SerializeField] private TutorialLevelManager tutorialLevelManager;
     private Animator animator;
     private Rigidbody2D playerRb;
     private bool isRunning = false;
@@ -177,6 +179,12 @@ public class PlayerController : MonoBehaviour
             playerRb.velocity = Vector2.zero;
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             usedDoubleJump = true;
+
+            // for tutorial
+            if(tutorialLevelManager.tutorialActive)
+            {
+                tutorialController.DoubleJump();
+            }
         }
     }
 
@@ -209,6 +217,12 @@ public class PlayerController : MonoBehaviour
             playerRb.velocity = Vector2.zero;
             animator.SetTrigger("torpedoAttack");
             StartCoroutine(TorpedoTimeout());
+
+            // for tutorial
+            if(tutorialLevelManager.tutorialActive)
+            {
+                tutorialController.TorpedoJump();
+            }
         }
     }
 
