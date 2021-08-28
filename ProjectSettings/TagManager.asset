@@ -12,6 +12,9 @@ TagManager:
   - Gem
   - BouncePad
   - EnemyHurtBox
+  - FloatTrigger
+  - TorpedoTrigger
+  - EndLevelTrigger
   layers:
   - Default
   - TransparentFX

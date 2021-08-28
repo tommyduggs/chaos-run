@@ -29,7 +29,7 @@ public class TutorialLevelManager : MonoBehaviour
             {
                 if (startGamePending)
                 {
-                    gameManager.RestartGame();
+                    gameManager.StartGame();
                     levelManager.NextLevel();
                     tutorialActive = false;
                 }

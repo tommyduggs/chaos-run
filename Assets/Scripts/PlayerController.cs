@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
-    [SerializeField] private GameObject level;
     private Animator animator;
     private Rigidbody2D playerRb;
     private bool isRunning = false;
@@ -45,24 +44,32 @@ public class PlayerController : MonoBehaviour
         float verticalVelocity = playerRb.velocity.y;
         animator.SetFloat("verticalVelocity", verticalVelocity);
 
-        if(Input.GetKeyDown(KeyCode.Q))
-        {
-            Jump();
-        }
+        
+    }
 
-        if(Input.GetKeyDown(KeyCode.W))
+    private void ProcessInputs()
+    {
+        if(!GameManager.menuOpen)
         {
-            FloatJump();
-        }
+            if(Input.GetKeyDown(KeyCode.Q))
+            {
+                Jump();
+            }
 
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            TorpedoJump();
-        }
+            if(Input.GetKeyDown(KeyCode.W))
+            {
+                FloatJump();
+            }
 
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            Slide();
+            if(Input.GetKeyDown(KeyCode.E))
+            {
+                TorpedoJump();
+            }
+
+            if(Input.GetKeyDown(KeyCode.R))
+            {
+                Slide();
+            }
         }
     }
 
@@ -86,7 +93,7 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         if(other.CompareTag("Checkpoint"))
         {
-            lastCheckpointPosition = level.transform.position.x;
+            gameManager.SetCheckpoint();
         }
         else if (other.CompareTag("Enemy"))
         {
@@ -129,7 +136,7 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("playerDied");
         lives--;
-        gameManager.EndGame();
+        gameManager.StopGame();
 
         if (lives == 0)
         {
@@ -214,9 +221,9 @@ public class PlayerController : MonoBehaviour
     }
     IEnumerator SpawnFromLastCheckpoint()
     {
-        yield return new WaitForSeconds(3.0f);
-        level.transform.position = new Vector3(lastCheckpointPosition, level.transform.position.y, level.transform.position.z);
+        yield return new WaitForSeconds(2.0f);
         transform.position = initialPlayerPosition;
+        animator.SetTrigger("run");
         gameManager.RestartGame();
     }
     IEnumerator SlideTimeout()
