@@ -7,30 +7,23 @@ using UnityEngine.Tilemaps;
 public class LevelManager : MonoBehaviour
 {
     [SerializeField] private GameObject levelOne;
+    [SerializeField] private GameObject levelTwo;
     [SerializeField] private GameManager gameManager;
-    private float moveSpeed = 15f;
+    private int currentLevel = 0;
     // Start is called before the first frame update
-    void Start()
-    {
-    }
 
-    // Update is called once per frame
-    void Update()
+    public void NextLevel()
     {
-        if(gameManager.gameActive)
+        currentLevel++;
+
+        switch(currentLevel)
         {
-            Debug.Log("Game is active in level manager");
-            MoveGridLeft();
+            case 1:
+                Instantiate(levelOne, levelOne.transform.position, levelOne.transform.rotation);
+                break;
+            case 2:
+                Instantiate(levelTwo, levelOne.transform.position, levelOne.transform.rotation);
+                break;
         }
-    }
-
-    public void StartLevel()
-    {
-
-    }
-
-    private void MoveGridLeft()
-    {
-        levelOne.transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
     }
 }

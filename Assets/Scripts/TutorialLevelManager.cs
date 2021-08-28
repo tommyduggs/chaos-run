@@ -6,6 +6,7 @@ public class TutorialLevelManager : MonoBehaviour
     [SerializeField] private Tilemap tutorialTilemap;
     [SerializeField] private GameObject tutorialLevel;
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private LevelManager levelManager;
     private float tutorialRepeatWidth;
     private Vector3 tutorialStartPosition;
     private float moveSpeed = 15f;
@@ -29,6 +30,7 @@ public class TutorialLevelManager : MonoBehaviour
                 if (startGamePending)
                 {
                     gameManager.RestartGame();
+                    levelManager.NextLevel();
                     tutorialActive = false;
                 }
                 

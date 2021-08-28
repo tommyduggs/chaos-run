@@ -7,7 +7,6 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private GameObject onScreenText;
-    public GameObject level;
     public bool gameActive = false;
     // Start is called before the first frame update
     void Start()

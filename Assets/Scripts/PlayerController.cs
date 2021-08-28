@@ -100,6 +100,14 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
+        else if(other.CompareTag("FloatTrigger"))
+        {
+            FloatJump();
+        }
+        else if(other.CompareTag("TorpedoTrigger"))
+        {
+            TorpedoJump();
+        }
         else if(other.CompareTag("SlideTrigger"))
         {
             Slide();
@@ -143,12 +151,14 @@ public class PlayerController : MonoBehaviour
     {
         if (!isJumping && !isSliding && !isFloating)
         {
+            animator.SetTrigger("jump");
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             isJumping = true;
         }
         // Double Jump
         else if (isJumping && !isTorpedoJumping && !usedDoubleJump)
         {
+            animator.SetTrigger("jump");
             playerRb.velocity = Vector2.zero;
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             usedDoubleJump = true;
