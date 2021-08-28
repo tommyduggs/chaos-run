@@ -10,8 +10,10 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D playerRb;
     private bool isRunning = false;
     private bool isJumping = false;
+    private bool isFloating = false;
     private bool isSliding = false;
     private bool isTorpedoJumping = false;
+    private bool isTorpedoAttacking = false;
     private bool usedDoubleJump = false;
     public float jumpForce = 13f;
     public float floatJumpForce = 9f;
@@ -68,9 +70,15 @@ public class PlayerController : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Ground"))
         {
+            if(isFloating || isTorpedoJumping)
+            {
+                animator.SetTrigger("run");
+            }
             playerRb.gravityScale = initialGravityScale;
             isJumping = false;
+            isFloating = false;
             isTorpedoJumping = false;
+            isTorpedoAttacking = false;
             usedDoubleJump = false;
         }
     }
@@ -133,7 +141,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (!isJumping && !isSliding)
+        if (!isJumping && !isSliding && !isFloating)
         {
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             isJumping = true;
@@ -149,35 +157,39 @@ public class PlayerController : MonoBehaviour
 
     private void FloatJump()
     {
-        if (!isJumping && !isSliding)
+        if (!isJumping && !isSliding && !isFloating)
         {
+            animator.SetTrigger("float");
             playerRb.gravityScale = floatJumpGravity;
             playerRb.AddForce(Vector2.up * floatJumpForce, ForceMode2D.Impulse);
-            isJumping = true;
+            isFloating = true;
         }
     }
 
     private void TorpedoJump()
     {
-        if (!isJumping && !isSliding)
+        if (!isJumping && !isSliding && !isFloating)
         {
             playerRb.gravityScale = torpedoJumpGravity;
             playerRb.AddForce(Vector2.up * torpedoJumpForce, ForceMode2D.Impulse);
             isJumping = true;
             isTorpedoJumping = true;
+            animator.SetTrigger("torpedoJump");
         }
 
-        else if (isJumping && isTorpedoJumping)
+        else if (isJumping && isTorpedoJumping && !isTorpedoAttacking)
         {
+            isTorpedoAttacking = true;
             playerRb.gravityScale = 0.0f;
             playerRb.velocity = Vector2.zero;
+            animator.SetTrigger("torpedoAttack");
             StartCoroutine(TorpedoTimeout());
         }
     }
 
     private void Slide()
     {
-        if (!isJumping && !isSliding)
+        if (!isJumping && !isSliding && !isFloating)
         {
             isSliding = true;
             animator.SetBool("isSliding", isSliding);
@@ -208,5 +220,6 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(1.0f);
         playerRb.gravityScale = torpedoJumpGravity;
+        animator.SetTrigger("torpedoJump");
     }
 }
