@@ -9,8 +9,10 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject levelOne;
     [SerializeField] private GameObject levelTwo;
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private GameObject background;
     private GameObject currentLevelObj;
     private Vector3 lastCheckpointPosition;
+    private Vector3 lastCheckpointPositionBG;
     private int currentLevel = 0;
     // Start is called before the first frame update
 
@@ -45,11 +47,16 @@ public class LevelManager : MonoBehaviour
                 break;
         }
 
+        background.transform.position = lastCheckpointPositionBG;
         currentLevelObj.GetComponent<MoveLeft>().gameManager = gameManager;
     }
 
     public void SetCheckpoint()
     {
-        lastCheckpointPosition = currentLevelObj.transform.position;
+        if(!GameManager.testingMode)
+        {
+            lastCheckpointPosition = currentLevelObj.transform.position;
+            lastCheckpointPositionBG = background.transform.position;
+        }
     }
 }

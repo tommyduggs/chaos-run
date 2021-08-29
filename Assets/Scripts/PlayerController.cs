@@ -6,10 +6,18 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
-    [SerializeField] private TextMeshProUGUI gemText;
-    [SerializeField] private TextMeshProUGUI livesText;
+    //[SerializeField] private TextMeshProUGUI gemText;
+    //[SerializeField] private TextMeshProUGUI livesText;
     [SerializeField] private TutorialController tutorialController;
     [SerializeField] private TutorialLevelManager tutorialLevelManager;
+    [SerializeField] private AudioSource jumpSound;
+    [SerializeField] private AudioSource doubleJumpSound;
+    [SerializeField] private AudioSource floatSound;
+    [SerializeField] private AudioSource torpedoJumpSound;
+    [SerializeField] private AudioSource torpedoAttackSound;
+    [SerializeField] private AudioSource slideSound;
+    [SerializeField] private AudioSource hurtSound;
+    [SerializeField] private AudioSource runningSound;
     private Animator animator;
     private Rigidbody2D playerRb;
     private bool isRunning = false;
@@ -26,10 +34,12 @@ public class PlayerController : MonoBehaviour
     public float torpedoJumpGravity = 7f;
     private float initialGravityScale;
     private float lastCheckpointPosition;
-    private int lives = 3;
+    private int lives = 99;
     private Vector3 initialPlayerPosition;
     private int gemCount = 0;
     public float bounceForce = 18f;
+    private float playerInitialPosX;
+    private bool isPlayerHurt = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,7 +50,9 @@ public class PlayerController : MonoBehaviour
         initialGravityScale = playerRb.gravityScale;
         initialPlayerPosition = transform.position;
         
-        livesText.text = "LIVES: " + lives;
+        //livesText.text = "LIVES: " + lives;
+
+        playerInitialPosX = transform.position.x - 1.0f;
 
         Run();
     }
@@ -48,6 +60,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(transform.position.x < playerInitialPosX && gameManager.gameActive && !isPlayerHurt)
+        {
+            PlayerHurt();
+        }
         float verticalVelocity = playerRb.velocity.y;
         animator.SetFloat("verticalVelocity", verticalVelocity);
 
@@ -84,9 +100,14 @@ public class PlayerController : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Ground"))
         {
-            if(isFloating || isTorpedoJumping)
+            if((isFloating || isTorpedoJumping) && !isPlayerHurt)
             {
                 animator.SetTrigger("run");
+            }
+            
+            if(!isPlayerHurt)
+            {
+                runningSound.Play();
             }
             playerRb.gravityScale = initialGravityScale;
             isJumping = false;
@@ -102,7 +123,7 @@ public class PlayerController : MonoBehaviour
         {
             gameManager.SetCheckpoint();
         }
-        else if (other.CompareTag("Enemy"))
+        else if (other.CompareTag("Enemy") && !isPlayerHurt)
         {
             PlayerHurt();
         }
@@ -126,6 +147,14 @@ public class PlayerController : MonoBehaviour
         {
             Slide();
         }
+        else if (other.CompareTag("EndGameTrigger"))
+        {
+            gameManager.StopGame();
+            gameManager.DisplayMessageAndKeepOnScreen("Wow, you did it! Congratulations!");
+            gameManager.BeatGame();
+            animator.SetTrigger("idle");
+            animator.SetBool("isRunning", false);
+        }
     }
 
     private void GetGem(GameObject gem)
@@ -138,43 +167,54 @@ public class PlayerController : MonoBehaviour
             gemCount = 0;
         }
 
-        gemText.text = gemCount.ToString();
-        livesText.text = "LIVES: " + lives;
+        //gemText.text = gemCount.ToString();
+        //livesText.text = "LIVES: " + lives;
     }
 
     private void PlayerHurt()
     {
+        runningSound.Pause();
+        hurtSound.Play();
+        isPlayerHurt = true;
         animator.SetTrigger("playerDied");
         lives--;
+        //livesText.text = "LIVES: " + lives;
         gameManager.StopGame();
 
-        if (lives == 0)
-        {
-            // TODO: Build logic that shows Game Over text
-        }
-        else
-        {
-            StartCoroutine(SpawnFromLastCheckpoint());
-        }
+        StartCoroutine(SpawnFromLastCheckpoint());
+
+        // if (lives == 0 && !GameManager.testingMode)
+        // {
+        //     // TODO: Build logic that shows Game Over text
+        // }
+        // else
+        // {
+        //     StartCoroutine(SpawnFromLastCheckpoint());
+        // }
     }
 
     private void Run()
     {
         isRunning = !isRunning;
         animator.SetBool("isRunning", isRunning);
+        runningSound.Play();
     }
 
     private void Jump()
     {
-        if (!isJumping && !isSliding && !isFloating)
+        if (!isJumping && !isSliding && !isFloating && !isTorpedoJumping && !isPlayerHurt)
         {
+            runningSound.Pause();
+            jumpSound.Play();
+            playerRb.velocity = Vector2.zero;
             animator.SetTrigger("jump");
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             isJumping = true;
         }
         // Double Jump
-        else if (isJumping && !isTorpedoJumping && !usedDoubleJump)
+        else if (isJumping && !isTorpedoJumping && !usedDoubleJump && !isPlayerHurt)
         {
+            doubleJumpSound.Play();
             animator.SetTrigger("jump");
             playerRb.velocity = Vector2.zero;
             playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
@@ -190,8 +230,10 @@ public class PlayerController : MonoBehaviour
 
     private void FloatJump()
     {
-        if (!isJumping && !isSliding && !isFloating)
+        if (!isJumping && !isSliding && !isFloating && !isPlayerHurt)
         {
+            runningSound.Pause();
+            floatSound.Play();
             animator.SetTrigger("float");
             playerRb.gravityScale = floatJumpGravity;
             playerRb.AddForce(Vector2.up * floatJumpForce, ForceMode2D.Impulse);
@@ -201,8 +243,10 @@ public class PlayerController : MonoBehaviour
 
     private void TorpedoJump()
     {
-        if (!isJumping && !isSliding && !isFloating)
+        if (!isJumping && !isSliding && !isFloating && !isPlayerHurt)
         {
+            runningSound.Pause();
+            torpedoJumpSound.Play();
             playerRb.gravityScale = torpedoJumpGravity;
             playerRb.AddForce(Vector2.up * torpedoJumpForce, ForceMode2D.Impulse);
             isJumping = true;
@@ -210,8 +254,9 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger("torpedoJump");
         }
 
-        else if (isJumping && isTorpedoJumping && !isTorpedoAttacking)
+        else if (isJumping && isTorpedoJumping && !isTorpedoAttacking && !isPlayerHurt)
         {
+            torpedoAttackSound.Play();
             isTorpedoAttacking = true;
             playerRb.gravityScale = 0.0f;
             playerRb.velocity = Vector2.zero;
@@ -228,8 +273,10 @@ public class PlayerController : MonoBehaviour
 
     private void Slide()
     {
-        if (!isJumping && !isSliding && !isFloating)
+        if (!isJumping && !isSliding && !isFloating && !isPlayerHurt)
         {
+            runningSound.Pause();
+            slideSound.Play();
             isSliding = true;
             animator.SetBool("isSliding", isSliding);
             StartCoroutine(SlideTimeout());
@@ -238,12 +285,21 @@ public class PlayerController : MonoBehaviour
 
     public void Bounce()
     {
+        jumpSound.Play();
+        playerRb.gravityScale = initialGravityScale;
         playerRb.velocity = Vector2.zero;
         playerRb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
     }
     IEnumerator SpawnFromLastCheckpoint()
     {
         yield return new WaitForSeconds(2.0f);
+        isPlayerHurt = false;
+        isJumping = false;
+        isFloating = false;
+        isTorpedoJumping = false;
+        isTorpedoAttacking = false;
+        usedDoubleJump = false;
+        playerRb.gravityScale = initialGravityScale;
         transform.position = initialPlayerPosition;
         animator.SetTrigger("run");
         gameManager.RestartGame();
@@ -251,14 +307,29 @@ public class PlayerController : MonoBehaviour
     IEnumerator SlideTimeout()
     {
         yield return new WaitForSeconds(1.0f);
-        isSliding = false;
-        animator.SetBool("isSliding", isSliding);
+        if (!isPlayerHurt)
+        {
+            runningSound.Play();
+            isSliding = false;
+            animator.SetBool("isSliding", isSliding);
+        }
+        else
+        {
+            isSliding = false;
+            animator.SetBool("isSliding", false);
+        }
     }
 
     IEnumerator TorpedoTimeout()
     {
-        yield return new WaitForSeconds(1.0f);
-        playerRb.gravityScale = torpedoJumpGravity;
-        animator.SetTrigger("torpedoJump");
+        yield return new WaitForSeconds(0.5f);
+        if (!isPlayerHurt)
+        {
+            playerRb.gravityScale = torpedoJumpGravity;
+            if(isTorpedoJumping)
+            {
+                animator.SetTrigger("torpedoJump");
+            }
+        }
     }
 }

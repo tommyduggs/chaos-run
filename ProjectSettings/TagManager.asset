@@ -15,6 +15,7 @@ TagManager:
   - FloatTrigger
   - TorpedoTrigger
   - EndLevelTrigger
+  - EndGameTrigger
   layers:
   - Default
   - TransparentFX

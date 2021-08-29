@@ -12,27 +12,51 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject startMenu;
     [SerializeField] private GameObject startMenuFirst;
     [SerializeField] private GameObject tutorialFirst;
+    [SerializeField] private AudioSource mainSong;
+    [SerializeField] private AudioSource endSong;
     private EventSystem eventSystem;
     public bool menuOpen = false;
     public bool gameActive = false;
+    public static bool testingMode = false;
+    private bool gamePaused = false;
     // Start is called before the first frame update
     void Start()
     {
         eventSystem = EventSystem.current;
+
+        if(testingMode)
+        {
+            gameActive = true;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        // if(Input.GetKeyDown(KeyCode.Escape))
+        // {
+        //     if(gameActive && !menuOpen && gameActive)
+        //     {
+        //         OpenStartMenu();
+        //     }
+        //     else if(menuOpen)
+        //     {
+        //         ResumeGame();
+        //     }
+        // }
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Escape))
         {
-            if(gameActive && !menuOpen && gameActive)
+            if (gamePaused)
             {
-                OpenStartMenu();
+                gamePaused = false;
+                Time.timeScale = 1f;
+                gameActive = true;
             }
-            else if(menuOpen)
+            else if (gameActive)
             {
-                ResumeGame();
+                gamePaused = true;
+                gameActive = false;
+                Time.timeScale = 0f;
             }
         }
     }
@@ -40,17 +64,20 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         gameActive = true;
+        mainSong.Play();
     }
 
     public void RestartGame()
     {
         levelManager.RestartLevel();
         gameActive = true;
+        mainSong.Play();
     }
 
     public void StopGame()
     {
         gameActive = false;
+        mainSong.Stop();
     }
 
     public void SetCheckpoint()
@@ -103,6 +130,11 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         gameActive = true;
         menuOpen = false;
+    }
+
+    public void BeatGame()
+    {
+        endSong.Play();
     }
 
     public void CheatCodes()

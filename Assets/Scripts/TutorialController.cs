@@ -37,6 +37,13 @@ public class TutorialController : MonoBehaviour
             gameManager.HideMessagesImmediately();
             tutorialLevelManager.StartGame();
         }
+        // remeber to delete this
+        else if(Input.GetKeyDown(KeyCode.Space))
+        {
+            gameManager.HideMessagesImmediately();
+            tutorialLevelManager.StartGame();
+        }
+
     }
 
     private void ShowNextMessage()
