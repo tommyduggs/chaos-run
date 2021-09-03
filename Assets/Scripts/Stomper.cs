@@ -19,6 +19,10 @@ public class Stomper : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.CompareTag("Ground"))
+        {
+            player.GroundPlayer();
+        }
         if (other.CompareTag("BouncePad"))
         {
             player.Bounce();

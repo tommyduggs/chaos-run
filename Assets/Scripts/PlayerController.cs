@@ -96,26 +96,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D col)
+    public void GroundPlayer()
     {
-        if (col.gameObject.CompareTag("Ground"))
+        if((isFloating || isTorpedoJumping) && !isPlayerHurt)
         {
-            if((isFloating || isTorpedoJumping) && !isPlayerHurt)
-            {
-                animator.SetTrigger("run");
-            }
-            
-            if(!isPlayerHurt)
-            {
-                runningSound.Play();
-            }
-            playerRb.gravityScale = initialGravityScale;
-            isJumping = false;
-            isFloating = false;
-            isTorpedoJumping = false;
-            isTorpedoAttacking = false;
-            usedDoubleJump = false;
+            animator.SetTrigger("run");
         }
+        
+        if(!isPlayerHurt)
+        {
+            runningSound.Play();
+        }
+        playerRb.gravityScale = initialGravityScale;
+        isJumping = false;
+        isFloating = false;
+        isTorpedoJumping = false;
+        isTorpedoAttacking = false;
+        usedDoubleJump = false;
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
