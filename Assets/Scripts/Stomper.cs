@@ -23,7 +23,7 @@ public class Stomper : MonoBehaviour
         {
             player.GroundPlayer();
         }
-        if (other.CompareTag("BouncePad"))
+        else if (other.CompareTag("BouncePad"))
         {
             player.Bounce();
         }

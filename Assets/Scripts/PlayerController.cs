@@ -146,6 +146,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.CompareTag("EndGameTrigger"))
         {
+            runningSound.Stop();
             gameManager.StopGame();
             gameManager.DisplayMessageAndKeepOnScreen("Wow, you did it! Congratulations!");
             gameManager.BeatGame();
